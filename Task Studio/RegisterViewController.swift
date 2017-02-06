@@ -1,29 +1,30 @@
 //
-//  ViewController.swift
+//  RegisterViewController.swift
 //  Task Studio
 //
-//  Created by Nerudo Mregi on 2017/02/01.
+//  Created by Nerudo Mregi on 2017/02/03.
 //  Copyright © 2017 NM. All rights reserved.
 //
 
+import Foundation
 import UIKit
 import Alamofire
 import QorumLogs
 
-class ViewController: UIViewController,UITextFieldDelegate {
-
-    @IBOutlet weak var txtUserName: UITextField!
+class RegisterViewController: UIViewController,UITextFieldDelegate {
     @IBOutlet weak var txtPassword: UITextField!
-    @IBOutlet weak var btnLogin: UIButton!
+    
+    @IBOutlet weak var btnRegister: UIButton!
+    @IBOutlet weak var txtUserName: UITextField!
     var snakView: SnakeView!
     func handleResponse(json: [String: Any]){
         QL1(json)
-        
         let message = json["Message"] as! String
+        
         snakView.updateData(title: message);
         self.view.addSubview(snakView)
     }
-    @IBAction func login(_ sender: Any) {
+    @IBAction func register(_ sender: Any) {
         if(txtUserName.text != "" && isValidEmail(emailString: txtUserName.text!) && txtPassword.text != ""){
             ITU_API().getSignUpUrl(username: txtUserName.text!, password: txtPassword.text!, deviceID: "28362638320236283", completion:handleResponse)
         }
@@ -32,7 +33,7 @@ class ViewController: UIViewController,UITextFieldDelegate {
         super.viewDidLoad()
         snakView = SnakeView(frame: Utilities.CGRectMake(0 ,self.view.frame.size.height-66, self.view.frame.size.width, 66))
         // Do any additional setup after loading the view, typically from a nib.
-        btnLogin.layer.cornerRadius = 4;
+        btnRegister.layer.cornerRadius = 4;
         txtUserName.layer.cornerRadius = 4;
         txtPassword.layer.cornerRadius = 4;
         let tap:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.DismissKeyboard))
@@ -52,8 +53,4 @@ class ViewController: UIViewController,UITextFieldDelegate {
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
         return emailTest.evaluate(with: emailString)
     }
-    
-
-
 }
-
