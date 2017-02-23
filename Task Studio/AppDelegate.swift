@@ -9,7 +9,9 @@
 import UIKit
 import CoreData
 import QorumLogs
-
+import ChameleonFramework
+import GradientLoadingBar
+import RealmSwift
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -18,12 +20,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         QorumLogs.enabled = true
+        GradientLoadingBar(
+            height: 5,
+            durations: Durations(fadeIn: 1.0, fadeOut: 2.0, progress: 8.00)
+            ).saveInstance()
+        
+        let config = Realm.Configuration(
+            // Set the new schema version. This must be greater than the previously used
+            // version (if you've never set a schema version before, the version is 0).
+            schemaVersion: 6,
+            
+            // Set the block which will be called automatically when opening a Realm with
+            // a schema version lower than the one set above
+            migrationBlock: { migration, oldSchemaVersion in
+                // We haven’t migrated anything yet, so oldSchemaVersion == 0
+                if (oldSchemaVersion < 5) {
+                    // Nothing to do!
+                    // Realm will automatically detect new properties and removed properties
+                    // And will update the schema on disk automatically
+                }
+        })
+        
+        // Tell Realm to use this new configuration object for the default Realm
+        Realm.Configuration.defaultConfiguration = config
+        
+        // Now that we've told Realm how to handle the schema change, opening the file
+        // will automatically perform the migration
+        let realm = try! Realm()
+        let navigationBarAppearace = UINavigationBar.appearance()
+        navigationBarAppearace.tintColor = UIColor.flatBlack
+        navigationBarAppearace.barTintColor = UIColor.white
+
+        VSO.sharedInstance.refreshToken(completionHandler: {_ in})
         //QorumLogs.test()
         return true
     }
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
-        VSO_API_Manager.sharedInstance.processOAuthStep1Response(url: url as NSURL)
+        VSO.sharedInstance.processOAuthStep1Response(url: url as NSURL)
         return true
+    }
+    func applicationDidFinishLaunching(_ application: UIApplication) {
+        //self.navigationController?.hidesNavigationBarHairline = true
     }
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -41,6 +78,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        //VSO.sharedInstance.refreshToken(completionHandler: {_ in })
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
