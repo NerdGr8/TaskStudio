@@ -25,16 +25,16 @@ class ViewController: UIViewController,UITextFieldDelegate {
     }
     @IBAction func login(_ sender: Any) {
         if(txtUserName.text != "" && isValidEmail(emailString: txtUserName.text!) && txtPassword.text != ""){
-            ITU_API().getSignUpUrl(username: txtUserName.text!, password: txtPassword.text!, deviceID: "28362638320236283", completion:handleResponse)
+           
         }
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         snakView = SnakeView(frame: Utilities.CGRectMake(0 ,self.view.frame.size.height-66, self.view.frame.size.width, 66))
         // Do any additional setup after loading the view, typically from a nib.
-        btnLogin.layer.cornerRadius = 4;
-        txtUserName.layer.cornerRadius = 4;
-        txtPassword.layer.cornerRadius = 4;
+        btnLogin.layer.cornerRadius = 23;
+        txtUserName.layer.cornerRadius = 23;
+        txtPassword.layer.cornerRadius = 23;
         let tap:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.DismissKeyboard))
         self.view.addGestureRecognizer(tap)
     }

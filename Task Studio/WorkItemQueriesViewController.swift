@@ -52,7 +52,7 @@ class WorkItemQueriesViewController: UIViewController, UITableViewDataSource, UI
                     print(json!)
                 }
                 else{
-                    print("Error: \(error as? String)")
+                    print("Error: \(String(describing: error as? String))")
                 }
                 GradientLoadingBar.sharedInstance().hide()
             })
@@ -71,6 +71,13 @@ class WorkItemQueriesViewController: UIViewController, UITableViewDataSource, UI
             }
         }
         self.table.reloadData()
+        if(cells.items.count == 0){
+            self.showAlert(message: "No work item queries")
+            VSORequest.getAllTasks(accountName: currentOrganisation!, project: currentProject!) { (json, error) in
+                QL1(json)
+                QL4(error)
+            }
+        }
         QL1(cells.items.count)
     }
     override func didReceiveMemoryWarning() {
@@ -175,53 +182,6 @@ class WorkItemQueriesViewController: UIViewController, UITableViewDataSource, UI
             }
         }
     }
-    /*
-     TablViewDataSource
-     */
-    /*
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let numberOfRows = (projectQueries?.count)! as Int
-        return numberOfRows
-    }
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
-    }
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
-    }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath as IndexPath)
-        
-        let query = projectQueries?[indexPath.row]
-        
-        cell.textLabel?.textColor = UIColor.flatBlackDark
-        cell.detailTextLabel?.textColor = UIColor.flatGray
-        // Configure Cell
-        cell.textLabel?.text = query?.name
-        cell.detailTextLabel?.text = query?.path
-        
-        return cell
-    }
-    
-    //Delegate Methods
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        QL1("You selected cell #\(indexPath.row)!")
-        let row = indexPath.row
-        
-        QL1(projectQueries?[row])
-        GradientLoadingBar.sharedInstance().show()
-        //UserDefaults.standard.set((organisationProjects?[row].organizationName)!, forKey : TaskStudioSession().orgName)
-        
-        //let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        //let vc = storyboard.instantiateViewController(withIdentifier: "WorkItemQueriesViewController") as! WorkItemQueriesViewController
-        //
-        //self.show(vc, sender: self)
-        
-    }
- */
 
     /*
     // MARK: - Navigation

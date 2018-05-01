@@ -7,7 +7,6 @@
 //
 import Foundation
 import Alamofire
-import Locksmith
 import QorumLogs
 
 class OAuth2RequestRetry: RequestRetrier {
@@ -40,37 +39,28 @@ class AccessTokenAdapter: RequestAdapter{
         return urlRequest
     }
 }
-class VSO_API_Manager
+class VSO
 {
-    static let sharedInstance = VSO_API_Manager()
+    static let sharedInstance = VSO()
+    let defaults = UserDefaults.standard
     var OAuthToken: String?
         {
         set
         {
             if let valueToSave = newValue
             {
-                do {
-                    try Locksmith.saveData(data: ["token": valueToSave], forUserAccount: "vso")
-                }
-                catch LocksmithError.duplicate {
-                    // do something in reponse to Duplicate error
-                    do {
-                        try Locksmith.updateData(data: ["token": valueToSave], forUserAccount: "vso")
-                        
-                    } catch {
-                        QL1(error)
-                    }
-                } catch {
-                    // do something in reponse to any other error
-                    QL1(error)
-                }
+                defaults.set(valueToSave, forKey: "token")
+                defaults.set(false, forKey: "loadingOAuthToken") //We have a token now so loading is done
+                 UserDefaults.standard.synchronize()
+            }
+            else if newValue == nil{
+                //Trying to rest this account
+                defaults.removeObject(forKey: "token")
             }
         }
         get
         {
-            // try to load from keychain
-            let dictionary = Locksmith.loadDataForUserAccount(userAccount: "vso")
-            if let token =  dictionary?["token"] as? String {
+            if let token = defaults.string(forKey: "token"){
                 return token
             }
             return nil
@@ -82,37 +72,28 @@ class VSO_API_Manager
         {
             if let valueToSave = newValue
             {
-                do {
-                    try Locksmith.saveData(data: ["refresh_token": valueToSave], forUserAccount: "vso")
-                }
-                catch LocksmithError.duplicate {
-                    // do something in reponse to Duplicate error
-                    do {
-                        try Locksmith.updateData(data: ["refresh_token": valueToSave], forUserAccount: "vso")
-                        
-                    } catch {
-                        QL1(error)
-                    }
-                } catch {
-                    // do something in reponse to any other error
-                    QL1(error)
-                }
+                defaults.set(valueToSave, forKey: "refresh_token")
+                UserDefaults.standard.synchronize()
+            }
+            else if newValue == nil{
+                //Trying to rest this account
+                defaults.removeObject(forKey: "refresh_token")
             }
         }
         get
         {
-            // try to load from keychain
-            let dictionary = Locksmith.loadDataForUserAccount(userAccount: "vso")
-            if let token =  dictionary?["refresh_token"] as? String {
-                return token
+            if let refresh_token = defaults.string(forKey: "refresh_token"){
+                QL2(refresh_token)
+                return refresh_token
             }
             return nil
         }
     }
+    
     var OAuthScope: String?
-    let redirect_uri : String = "https://taskstudio.azurewebsites.net/app/auth"
-    var clientID: String = "ED790B58-A3DD-4061-8E16-2DC7F4F4857A"
-    var clientSecret: String = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im9PdmN6NU1fN3AtSGpJS2xGWHo5M3VfVjBabyJ9.eyJjaWQiOiJlZDc5MGI1OC1hM2RkLTQwNjEtOGUxNi0yZGM3ZjRmNDg1N2EiLCJjc2kiOiJmOTg0ZDc1ZS1hMjkyLTRlMzQtYTRhZC0wN2E0NDhiMTlkMDciLCJuYW1laWQiOiJlY2VjNmFiMi02ZDg3LTQ4OGYtOWU4ZC1hYTdiMmJiZTBkNjIiLCJpc3MiOiJhcHAudnNzcHMudmlzdWFsc3R1ZGlvLmNvbSIsImF1ZCI6ImFwcC52c3Nwcy52aXN1YWxzdHVkaW8uY29tIiwibmJmIjoxNDg2MTA5Njk5LCJleHAiOjE2NDM4NzYwOTl9.1D7HZQGdwtf8Yjh3odpx1SYgeweXGJBiiwWbIbQlTkYnn0yJ1tmgk1hUh5v_7K2jCSPpbRUhCVc9xUUFKKh9tMmhfHQG_3dl2Elsp6YL7J1GTkHw_zA-B3wpzlRyq4S1bdamZCAP6GycVPlVJaKvt9eYtZxp0NAVq_B0FplCxkej3Jh-ibrGYcfahKrZvkJGdue8bGSFq_2yOyzOuQFUWBX5OdWGEPMwVxKQZrMpnrGhWtKJ9i7FL3PyfyUURieb4TrbZu1Gycl9RlNylNz-AS_MMTmAI3lNncsBIe1QHmUnF6ICj_Hwy5lP9RFYSCFt6WmlhwKzpEOG7wWo5gRw7g"
+    let redirect_uri : String = "https://tskstds"
+    var clientID: String = "84CAB7C3-3DE1-4A06-946B-28175BF0F933"
+    var clientSecret: String = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im9PdmN6NU1fN3AtSGpJS2xGWHo5M3VfVjBabyJ9.eyJjaWQiOiI4NGNhYjdjMy0zZGUxLTRhMDYtOTQ2Yi0yODE3NWJmMGY5MzMiLCJjc2kiOiJhOGVjZTk5Ny00YzViLTQxNTYtYmM1Mi1mZTUzM2E0ODAyYWUiLCJuYW1laWQiOiJlY2VjNmFiMi02ZDg3LTQ4OGYtOWU4ZC1hYTdiMmJiZTBkNjIiLCJpc3MiOiJhcHAudnNzcHMudmlzdWFsc3R1ZGlvLmNvbSIsImF1ZCI6ImFwcC52c3Nwcy52aXN1YWxzdHVkaW8uY29tIiwibmJmIjoxNDg3NzUzMDAyLCJleHAiOjE2NDU1MTk0MDJ9.YfdMk2aNPWPlEhSk3DgS4aWpIeahgDov5hvYzAuYi0N5GquJic4-AofJo6mGNc7XzaofwvEKt8xG4FB5-2JriA1og5IFhkVcDwk5r7mT4uDp84krso4iKrcuSJsyXYBdR8GR60UUwUuzJpFWQMIjHxZZ9GLhAE-MCKBX1DpGWLG2E6PAyxzp8b50XYYRZCG5l0szBsapPPiDcavVI92cPAHQ7YSVzvgtcAlCwxojeno7ySkdtNBmzmGhMkShqWT7P05xabY9OoFLsjYM-VdSFrPBcBF1GEjklHMMW95T5p-10LmHIcXZ8hw8XmOvA3w2bsz7o3Iu7tI-hfz-VweeOg"
     // handlers for the OAuth process
     // stored as vars since sometimes it requires a round trip to safari which
     // makes it hard to just keep a reference to it
@@ -124,14 +105,14 @@ class VSO_API_Manager
         if hasOAuthToken()
         {
             manager.adapter = AccessTokenAdapter(accessToken: OAuthToken!)
-            manager.retrier = OAuth2RequestRetry()
+            //manager.retrier = OAuth2RequestRetry()
         }
         return manager
     }
     init () {
         if hasOAuthToken()
         {
-           
+            
         }
     }
     func hasOAuthToken() -> Bool
@@ -144,6 +125,7 @@ class VSO_API_Manager
     }
     func processOAuthStep1Response(url: NSURL)
     {
+        QL2("Loading Step 1 Response")
         let components = NSURLComponents(url: url as URL, resolvingAgainstBaseURL: false)
         var code:String?
         if let queryItems = components?.queryItems
@@ -155,7 +137,11 @@ class VSO_API_Manager
                     code = queryItem.value
                     break
                 }
+                print(queryItem)
             }
+        }
+        else{
+            QL2("Couldnt find query items")
         }
         if let receivedCode = code
         {
@@ -174,31 +160,32 @@ class VSO_API_Manager
                     }
                     self.OAuthToken = responseJSON["access_token"] as! String?
                     self.OAuthRefreshToken = responseJSON["refresh_token"] as! String?
-                    //self.OAuthScope = responseJSON["scope"] as! String?
-                    //QL1("AuthToken:"+self.OAuthToken! as Any)
                     
-            }
-            let defaults = UserDefaults.standard
-            defaults.set(false, forKey: "loadingOAuthToken")
-            if self.hasOAuthToken()
-            {
-                if let completionHandler = self.OAuthTokenCompletionHandler
-                {
-                    completionHandler(nil)
-                }
-            }
-            else
-            {
-                if let completionHandler = self.OAuthTokenCompletionHandler
-                {
-                    let nOAuthError = NSError(domain: "Auth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not obtain an OAuth token", NSLocalizedRecoverySuggestionErrorKey: "Please retry your request"])
-                    completionHandler(nOAuthError)
-                }
+                    UserDefaults.standard.synchronize()
+                    //self.OAuthScope = responseJSON["scope"] as! String?
+                    QL1("AuthToken:\(String(describing: self.OAuthToken))")
+                    
+                    self.defaults.set(false, forKey: "loadingOAuthToken")
+                    if self.hasOAuthToken()
+                    {
+                        if let completionHandler = self.OAuthTokenCompletionHandler
+                        {
+                            completionHandler(nil)
+                        }
+                    }
+                    else
+                    {
+                        if let completionHandler = self.OAuthTokenCompletionHandler
+                        {
+                            let nOAuthError = NSError(domain: "Auth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not obtain an OAuth token", NSLocalizedRecoverySuggestionErrorKey: "Please retry your request"])
+                            completionHandler(nOAuthError)
+                        }
+                    }
+                    
             }
         }
         else{
-            // no code in URL that we launched with
-            let defaults = UserDefaults.standard
+            QL2("no code in URL that we launched with")
             defaults.set(false, forKey: "loadingOAuthToken")
         }
         
@@ -207,11 +194,10 @@ class VSO_API_Manager
     
     func startOAuth2Login()
     {
-        let qString:String = "?client_id=ED790B58-A3DD-4061-8E16-2DC7F4F4857A&response_type=Assertion&state=User1&scope=vso.dashboards%20vso.identity%20vso.work_write&redirect_uri=https://taskstudio.azurewebsites.net/app/auth"
+        let qString:String = "?client_id="+clientID+"&response_type=Assertion&state=User1&scope=vso.chat_manage%20vso.dashboards%20vso.dashboards_manage%20vso.identity%20vso.notification_manage%20vso.profile_write%20vso.project_manage%20vso.release_manage%20vso.test_write%20vso.work_write&redirect_uri=https://taskstudio.azurewebsites.net/app/auth"
         let authPath:String = "https://app.vssps.visualstudio.com/oauth2/authorize"+qString
         if let authURL:URL = URL(string: authPath)
         {
-            let defaults = UserDefaults.standard
             defaults.set(true, forKey: "loadingOAuthToken")
             // do stuff with authURL
             UIApplication.shared.open(authURL)
@@ -221,29 +207,39 @@ class VSO_API_Manager
     //REFRESH TOKEN
     func refreshToken(completionHandler:@escaping (Bool?)->Void)
     {
-        if hasOAuthToken()
+        
+        //REALM CHECK
+        if self.hasOAuthToken() || (self.OAuthRefreshToken != nil)
         {
             QL1("Refreshing token")
             let getTokenPath:String = "https://app.vssps.visualstudio.com/oauth2/token"
-            let tokenParams = ["client_assertion_type" :"urn:ietf:params:oauth:client-assertion-type:jwt-bearer","redirect_uri": redirect_uri, "client_assertion": clientSecret, "assertion": self.clientSecret, "grant_type": self.OAuthRefreshToken]
+            let tokenParams = ["client_assertion_type" :"urn:ietf:params:oauth:client-assertion-type:jwt-bearer","redirect_uri": self.redirect_uri, "client_assertion": self.clientSecret, "assertion": self.OAuthRefreshToken!, "grant_type": "refresh_token"]
             let headers: HTTPHeaders = [
                 "Content-type": "application/x-www-form-urlencoded"
             ]
+            QL1(tokenParams)
             Alamofire.request(getTokenPath, method : .post , parameters: tokenParams, headers : headers)
                 .responseJSON{ response in
-                    // TODO: handle response to extract OAuth token
-                    //print(response.result.value)
-                    guard let responseJSON = response.result.value as? [String: Any] else {
-                        QL1("Invalid token information received from the service")
+                    QL1(response)
+                    if response.error != nil{
+                        QL4("Auth refresh error")
+                    }
+                    else{
+                        // TODO: handle response to extract OAuth token
+                        //print(response.result.value)
+                        guard let responseJSON = response.result.value as? [String: Any] else {
+                            QL1("Invalid token information received from the service")
+                            completionHandler(false)
+                            return
+                        }
+                        self.OAuthToken = responseJSON["access_token"] as! String?
+                        self.OAuthRefreshToken = responseJSON["refresh_token"] as! String?
+                                                //self.OAuthScope = responseJSON["scope"] as! String?
+                        //print(responseJSON["access_token"])
+                        QL1("New AuthToken:\(responseJSON["access_token"] as! String?)")
                         completionHandler(true)
                         return
                     }
-                    self.OAuthToken = responseJSON["access_token"] as! String?
-                    self.OAuthRefreshToken = responseJSON["refresh_token"] as! String?
-                    //self.OAuthScope = responseJSON["scope"] as! String?
-                    QL1("New AuthToken:\(responseJSON["access_token"])")
-                    completionHandler(true)
-                    return
             }
         }
         else{

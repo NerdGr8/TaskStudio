@@ -15,6 +15,7 @@ import ChameleonFramework
 
 class AddAccountViewController : UIViewController, ShowsAlert{
     
+    @IBOutlet weak var btnAddaccount: UIButton!
     @IBOutlet weak var tblAccounts: UITableView!
     @IBAction func AddAccount(_ sender: UIButton) {
         
@@ -40,6 +41,12 @@ class AddAccountViewController : UIViewController, ShowsAlert{
             }
             VSO.sharedInstance.startOAuth2Login()
         }
+        else{
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let vc = storyboard.instantiateViewController(withIdentifier: "AddAccountWebViewVC") as! AddAccountWebViewVC
+            self.show(vc, sender: self)
+
+        }
     }
     
     // Get the default Realm
@@ -52,11 +59,13 @@ class AddAccountViewController : UIViewController, ShowsAlert{
     }()
     var token: NotificationToken?
     
+    @IBOutlet weak var imgLogo: UIImageView!
     override func viewDidLoad() {
         super.viewDidLoad()
+        btnAddaccount.layer.cornerRadius = 22
         realm = try! Realm()
         self.tblAccounts.allowsSelection = true
-        token = userAccounts.addNotificationBlock {[weak self] (changes: RealmCollectionChange) in
+        token = userAccounts.observe {[weak self] (changes: RealmCollectionChange) in
             guard let tableView = self?.tblAccounts else { return }
             
             switch changes {
@@ -114,7 +123,6 @@ class AddAccountViewController : UIViewController, ShowsAlert{
             //defaults.set(false, forKey: "loadingOAuthToken")
             QL2(defaults.bool(forKey: "loadingOAuthToken"))
         }
-
     }
     func loadInitialData()
     {
@@ -233,18 +241,26 @@ extension AddAccountViewController : UITableViewDelegate{
         let row = indexPath.row
         
         UserDefaults.standard.set((userAccounts[row].accountName), forKey : TaskStudioSession().orgName)
-        
+        UserDefaults.standard.synchronize()
+
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "MainTBVC") as! MainTBVC
         self.show(vc, sender: self)
     }
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, canFocusRowAt indexPath: IndexPath) -> Bool {
         // let the controller to know that able to edit tableView's row
         return true
     }
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]?{
         let deleteAction = UITableViewRowAction(style: .default, title: "Remove", handler: { (action , indexPath) -> Void in
-            
+            // TODO : Remove only the data for the account specified
+            try! self.realm?.write {
+                self.realm?.deleteAll()
+            }
+            VSO.sharedInstance.OAuthToken = nil
+            VSO.sharedInstance.OAuthRefreshToken = nil
+            //UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+            UserDefaults.standard.synchronize()
             // Your delete code here.....
             QL2("Will delete")
         })

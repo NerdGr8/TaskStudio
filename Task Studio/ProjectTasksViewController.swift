@@ -64,7 +64,7 @@ class ProjectTasksViewController: UIViewController, UITableViewDataSource, UITab
                         if let workItems = json?["workItems"] as? [[String:Any]]{
                             QL2("we found workItems")
                             for c in workItems{
-                                //QL2(c)
+                                QL2(c)
                                 let task = VSOTask()
                                 task.id = ((c["id"] as! HasNumber!)?.integerValue)!
                                 task.url = c["url"] as! String!
@@ -90,12 +90,11 @@ class ProjectTasksViewController: UIViewController, UITableViewDataSource, UITab
                             }
                             if let workItems = result?["value"] as? [[String:Any]]{
                                 // QL2("we found workItems")
-                                //QL1(workItems)
+                                QL1(workItems)
                                 let vsoTasks = self.realm?.objects(VSOTask.self)
                                 
                                 for wi in workItems{
                                     if let id = wi["id"] as? NSNumber{
-                                        dump(id)
                                         if let item = vsoTasks?.filter(NSPredicate(format: "id == %@", id as NSNumber)).first{
                                             do{
                                                 try! self.realm?.write {
@@ -152,8 +151,8 @@ class ProjectTasksViewController: UIViewController, UITableViewDataSource, UITab
                         })
                     }
                     else{
-                        self.showAlert(message: "Error: \(error as? String)")
-                        print("Error: \(error as? String)")
+                        self.showAlert(message: "Error: \(String(describing: error as? String))")
+                        //print("Error: \(error as? String)")
                     }
                     GradientLoadingBar.sharedInstance().hide()
                 })

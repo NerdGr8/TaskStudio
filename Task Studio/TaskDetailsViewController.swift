@@ -23,11 +23,11 @@ class TaskDetailsViewController: UIViewController {
         super.viewDidLoad()
         
         lblTitle.text = task?.title
-        lblAssignedTo.text = "  "+(task?.assignedTo)!
-        lblIterationPath.text = "  "+(task?.iterationPath)!
+        lblAssignedTo.text = (task?.assignedTo)?.padLeft(length: 2)
+        lblIterationPath.text = (task?.iterationPath)?.padLeft(length: 2)
         
-        lblState.text = "  "+(task?.state)!
-        lblWorkItemType.text = "  "+(task?.workItemType)!
+        lblState.text = (task?.state)?.padLeft(length: 2)
+        lblWorkItemType.text = (task?.workItemType)?.padLeft(length: 2)
         lblTaskID.text = "\((task?.id)!)"
         // Do any additional setup after loading the view.
         

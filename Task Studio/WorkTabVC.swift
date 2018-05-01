@@ -138,18 +138,22 @@ class WorkTabVC : UIViewController, UITableViewDataSource, UITableViewDelegate{
         
        // QL1(organisationProjects?[row])
         let _parentProject = organisationProjects?[row]
-        
+        var hasTasks : Bool = false
+        var hasQueries: Bool = false
         GradientLoadingBar.sharedInstance().show()
         QL1((organisationProjects?[row].owner?.accountName)!)
         //GET PROJECT QUERIES
         VSORequest.getTeamProjectAllTasks(accountName: (organisationProjects?[row].owner?.accountName)!, project: (organisationProjects?[row].name)!, completionHandler: {tasks , error in
             QL1(tasks as Any)
+            hasTasks = ((tasks?.count)! > 0)
         })
         VSORequest.getTeamProjectQueries(accountName: (organisationProjects?[row].owner?.accountName)!, project: (organisationProjects?[row].name)!, completionHandler: {queries , error in
             if error == nil {
                 if let p = queries,
                     let px = p["value"] as? [[String: AnyObject]] {
+                    hasQueries = (px.count>0)
                     for x in px {
+                        
                         let _query = VSOProjectQuery()
                         let createdBy = VSOUser()
                         let lastModifiedBy = VSOUser()
@@ -196,12 +200,22 @@ class WorkTabVC : UIViewController, UITableViewDataSource, UITableViewDelegate{
                 }
             }
             GradientLoadingBar.sharedInstance().hide()
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: "WorkItemQueriesViewController") as! WorkItemQueriesViewController
-            vc.currentProject = _parentProject?.name
-            vc.currentOrganisation = _parentProject?.owner?.accountName
-            
-            self.show(vc, sender: self)
+            if(hasTasks==true && hasQueries == true){
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let vc = storyboard.instantiateViewController(withIdentifier: "WorkItemQueriesViewController") as! WorkItemQueriesViewController
+                vc.currentProject = _parentProject?.name
+                vc.currentOrganisation = _parentProject?.owner?.accountName
+                
+                self.show(vc, sender: self)
+            }
+            else{
+                VSORequest.getAllTasks(accountName: (self.organisationProjects?[row].owner?.accountName)!, project: (self.organisationProjects?[row].name)!) { (json, error) in
+                    QL1(json)
+                    QL4(error)
+                }
+                
+                self.showAlert(message: "No Queries or Tasks to show")
+            }
         })
 
     }
