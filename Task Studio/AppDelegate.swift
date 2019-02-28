@@ -55,7 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //QorumLogs.test()
         return true
     }
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool {
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey: Any]) -> Bool{
         VSO.sharedInstance.processOAuthStep1Response(url: url as NSURL)
         return true
     }

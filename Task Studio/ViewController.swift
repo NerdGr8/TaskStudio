@@ -32,7 +32,7 @@ class ViewController: UIViewController,UITextFieldDelegate {
         super.viewDidLoad()
         snakView = SnakeView(frame: Utilities.CGRectMake(0 ,self.view.frame.size.height-66, self.view.frame.size.width, 66))
         // Do any additional setup after loading the view, typically from a nib.
-        btnLogin.layer.cornerRadius = 23;
+        btnLogin.layer.cornerRadius = 21;
         txtUserName.layer.cornerRadius = 23;
         txtPassword.layer.cornerRadius = 23;
         let tap:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ViewController.DismissKeyboard))
@@ -42,7 +42,7 @@ class ViewController: UIViewController,UITextFieldDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    func DismissKeyboard(){
+    @objc func DismissKeyboard(){
         self.view.endEditing(true)
     }
     func isValidEmail(emailString:String) -> Bool {

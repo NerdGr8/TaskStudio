@@ -148,6 +148,7 @@ class WorkTabVC : UIViewController, UITableViewDataSource, UITableViewDelegate{
             hasTasks = ((tasks?.count)! > 0)
         })
         VSORequest.getTeamProjectQueries(accountName: (organisationProjects?[row].owner?.accountName)!, project: (organisationProjects?[row].name)!, completionHandler: {queries , error in
+            QL1(queries)
             if error == nil {
                 if let p = queries,
                     let px = p["value"] as? [[String: AnyObject]] {

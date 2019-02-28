@@ -26,7 +26,7 @@ class RegisterViewController: UIViewController,UITextFieldDelegate {
     }
     @IBAction func register(_ sender: Any) {
         if(txtUserName.text != "" && isValidEmail(emailString: txtUserName.text!) && txtPassword.text != ""){
-            ITU_API().getSignUpUrl(username: txtUserName.text!, password: txtPassword.text!, deviceID: "28362638320236283", completion:handleResponse)
+            //
         }
     }
     override func viewDidLoad() {
@@ -43,7 +43,7 @@ class RegisterViewController: UIViewController,UITextFieldDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    func DismissKeyboard(){
+    @objc func DismissKeyboard(){
         self.view.endEditing(true)
     }
     func isValidEmail(emailString:String) -> Bool {

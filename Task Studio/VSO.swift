@@ -194,7 +194,7 @@ class VSO
     
     func startOAuth2Login()
     {
-        let qString:String = "?client_id="+clientID+"&response_type=Assertion&state=User1&scope=vso.chat_manage%20vso.dashboards%20vso.dashboards_manage%20vso.identity%20vso.notification_manage%20vso.profile_write%20vso.project_manage%20vso.release_manage%20vso.test_write%20vso.work_write&redirect_uri=https://taskstudio.azurewebsites.net/app/auth"
+        let qString:String = "?client_id="+clientID+"&response_type=Assertion&state=User1&scope=vso.chat_manage%20vso.dashboards%20vso.dashboards_manage%20vso.identity%20vso.notification_manage%20vso.profile_write%20vso.project_manage%20vso.release_manage%20vso.test_write%20vso.work_write&redirect_uri=https://tskstds"
         let authPath:String = "https://app.vssps.visualstudio.com/oauth2/authorize"+qString
         if let authURL:URL = URL(string: authPath)
         {
@@ -207,7 +207,6 @@ class VSO
     //REFRESH TOKEN
     func refreshToken(completionHandler:@escaping (Bool?)->Void)
     {
-        
         //REALM CHECK
         if self.hasOAuthToken() || (self.OAuthRefreshToken != nil)
         {

@@ -24,7 +24,6 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>tskstds</string>
-				<string>https://taskstudio.azurewebsites.net/app/auth</string>
 			</array>
 		</dict>
 	</array>

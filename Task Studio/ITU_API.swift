@@ -12,7 +12,7 @@ import QorumLogs
 
 class ITU_API {
     
-     let API_Root = "https://test-itrustyouservices.azurewebsites.net"
+     let API_Root = "https://root.azurewebsites.net"
     public func getSignUpUrl(username: String, password: String, deviceID: String, completion:@escaping ([String: Any])->Void) -> Void{
         
         let parameters: Parameters = [
@@ -25,7 +25,7 @@ class ITU_API {
                 "Accept": "application/json"
             ]
 
-        let urlEndpoint = "https://test-itrustyouservices.azurewebsites.net/api/SignUp/SignUpCredentials/"
+        let urlEndpoint = "https://root/api/SignUp/SignUpCredentials/"
         
             Alamofire.request(urlEndpoint, method: .put, parameters : parameters, encoding: JSONEncoding.default, headers : headers)
             .responseJSON { response in

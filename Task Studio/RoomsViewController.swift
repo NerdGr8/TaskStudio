@@ -139,9 +139,6 @@ class RoomsViewController: UIViewController, UITableViewDataSource, UITableViewD
          
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "ChatRoomViewController") as! ChatRoomViewController
-            vc.chatRoom = chatRooms[row].id
-        vc.senderDisplayName = user?.displayName
-        vc.senderId = user?.id
         vc.title = chatRooms[row].name
         //self.show(vc, sender: self)
         self.navigationController?.pushViewController(vc, animated: true)

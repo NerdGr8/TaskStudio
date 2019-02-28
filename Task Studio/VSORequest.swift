@@ -101,7 +101,7 @@ class VSORequest{
     //TODO:Change Depth to 2
     class func getTeamProjectQueries(accountName:String, project:String, completionHandler:@escaping ([String: Any]?, Error?)->Void) -> Void{
         QL1("Get Project Queries")
-        let path = "https://"+accountName+".visualstudio.com/DefaultCollection/"+project.URLEncodedString()!+"/_apis/wit/queries?$depth=1&$expand=wiql&api-version=2.2"
+        let path = "https://"+accountName+".visualstudio.com/"+project.URLEncodedString()!+"/_apis/wit/queries?$depth=1&$expand=wiql&api-version=4.1"
         
         Alamofire.request(path, headers : headers)
             .responseJSON{ response in
@@ -216,14 +216,14 @@ class VSORequest{
     /*( Get all Tasks by sending a query manualy */
     class func getAllTasks(accountName:String, project:String, completionHandler:@escaping ([String: Any]?, Error?)->Void) -> Void{
         QL1("getTeamProjectAllTasks")
-        let path = "https://"+accountName+".visualstudio.com/_apis/wit/wiql?api-version=4.1"
+        //GET https://{accountName}.visualstudio.com/{project}/_apis/wit/queries?$expand={$expand}&$depth={$depth}&$includeDeleted={$includeDeleted}&api-version=5.0-preview.2
+
+        let path = "https://"+accountName+".visualstudio.com/"+project+"/_apis/wit/queries?api-version=5.0-preview.2"
         //POST REQUEST
         //Content-Type: application/json
         headers.updateValue("application/json", forKey: "Content-Type")
-        let parameters: Parameters = [
-            "query": "Select [System.Id], [System.Title], [System.State] From WorkItems Where [System.WorkItemType] = 'Task' AND [State] <> 'Closed' AND [State] <> 'Removed' order by [Microsoft.VSTS.Common.Priority] asc, [System.CreatedDate] desc"
-        ]
-        Alamofire.request(path,method : .post , parameters: parameters, headers : headers)
+        
+        Alamofire.request(path, headers : headers)
             .responseJSON{ response in
                 QL1(response)
                 if response.error != nil
