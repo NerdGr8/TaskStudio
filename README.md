@@ -3,6 +3,7 @@
 
 A visual studio team services client. 
 
+[Design files](https://www.behance.net/gallery/54160243/Task-Studio-ios)
 ## Getting Started
 
 This is a project that was built for personal use. It has had its fair share of issues due to being neglected for a while. To be able to continue with the development I have chosen to open source it.
