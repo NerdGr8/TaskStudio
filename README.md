@@ -2,8 +2,9 @@
 # Task Studio
 
 A visual studio team services client. 
+![Design](https://mir-s3-cdn-cf.behance.net/project_modules/fs/c6c57854160243.5959f54e76f00.png)
 
-[Design files](https://www.behance.net/gallery/54160243/Task-Studio-ios)
+[Design presentation](https://www.behance.net/gallery/54160243/Task-Studio-ios)
 ## Getting Started
 
 This is a project that was built for personal use. It has had its fair share of issues due to being neglected for a while. To be able to continue with the development I have chosen to open source it.
